@@ -9,6 +9,10 @@ import { join } from 'path';
 import { getLatestVersion } from './util';
 
 /* eslint-disable camelcase */
+/**
+ * A map of unversioned Android development tools and their corresponding package names and paths to their binary
+ * relative to `$ANDROID_HOME`.
+ */
 export const unversionedAndroidTools = {
     nimble_bridge: { path: 'emulator/nimble_bridge', package: 'emulator' },
     'goldfish-webrtc-bridge': { path: 'emulator/goldfish-webrtc-bridge', package: 'emulator' },
@@ -50,7 +54,11 @@ export const unversionedAndroidTools = {
     sqlite3: { path: 'platform-tools/sqlite3', package: 'platform-tools' },
     mke2fs: { path: 'platform-tools/mke2fs', package: 'platform-tools' },
     make_f2fs: { path: 'platform-tools/make_f2fs', package: 'platform-tools' },
-};
+} as const;
+/**
+ * A map of versioned Android development tools and their corresponding package names and paths to their binary relative
+ * to `$ANDROID_HOME`.
+ */
 export const versionedAndroidTools = {
     aapt: { path: (v) => `build-tools/${v}/aapt`, package: 'build-tools' },
     'split-select': { path: (v) => `build-tools/${v}/split-select`, package: 'build-tools' },
@@ -76,11 +84,19 @@ export const versionedAndroidTools = {
     avdmanager: { path: (v) => `cmdline-tools/${v}/bin/avdmanager`, package: 'cmdline-tools' },
     lint: { path: (v) => `cmdline-tools/${v}/bin/lint`, package: 'cmdline-tools' },
     sdkmanager: { path: (v) => `cmdline-tools/${v}/bin/sdkmanager`, package: 'cmdline-tools' },
-} satisfies Record<string, { path: (version: string) => string; package: string }>;
+} as const satisfies Record<string, { path: (version: string) => string; package: string }>;
 /* eslint-enable camelcase */
 
+/** The name of an Android development tool, either unversioned or versioned. */
 export type AndroidToolName = keyof typeof versionedAndroidTools | keyof typeof unversionedAndroidTools;
-export type AndroidTool = AndroidToolName | { tool: keyof typeof versionedAndroidTools; version: string };
+/**
+ * An Android development tool, specified as either a name (which will cause the latest installed or available version
+ * to be used) or a name with an explicit version (only possible for versioned tools).
+ *
+ * The version in this context is _not_ the version of the tool itself, but rather the version of the package that
+ * contains the tool.
+ */
+export type AndroidTool = AndroidToolName | { tool: keyof typeof versionedAndroidTools; packageVersion: string };
 
 const platform = process.platform;
 if (platform !== 'win32' && platform !== 'darwin' && platform !== 'linux')
@@ -128,7 +144,26 @@ const ensureSdkmanager = async () => {
     return { androidHome, sdkmanager };
 };
 
-export type AvailablePackage = { path: string; version: string; description: string };
+/** A package that can be installed by `sdkmanager`. */
+export type AvailablePackage = {
+    /**
+     * The argument to be passed to `sdkmanager` to install the package with this particular version (e.g.
+     * `build-tools;33.0.2`).
+     */
+    path: string;
+    /**
+     * The version of the package (e.g. `28.0.0`). Note that these are not necessarily the same as the version that is
+     * part of the `path`.
+     */
+    version: string;
+    /** A human-readable description of the package (e.g. `Android SDK Command-line Tools`). */
+    description: string;
+};
+/**
+ * Fetch a list of available packages that can be installed by `sdkmanager`.
+ *
+ * @returns An array of packages, each with their package path, version and description.
+ */
 export const listPackages = async (): Promise<AvailablePackage[]> => {
     const { androidHome, sdkmanager } = await ensureSdkmanager();
 
@@ -150,6 +185,14 @@ export const listPackages = async (): Promise<AvailablePackage[]> => {
         .filter((p): p is AvailablePackage => !!p.path && !!p.version && !!p.description);
 };
 
+/**
+ * Install one or more packages using `sdkmanager`. The specified packages are installed or updated to the latest
+ * version (if already installed) in an automatically created `$ANDROID_HOME` managed by andromatic.
+ *
+ * @param packages The path(s) of the packages to install, as to be passed to `sdkmanager`.
+ *
+ * @returns The path to `$ANDROID_HOME` where the packages are installed.
+ */
 export const installPackages = async (...packages: string[]) => {
     const { androidHome, sdkmanager } = await ensureSdkmanager();
 
@@ -158,12 +201,25 @@ export const installPackages = async (...packages: string[]) => {
     return androidHome;
 };
 
+/** Update all installed packages to the latest version using `sdkmanager`. */
 export const updatePackages = async () => {
     const { androidHome, sdkmanager } = await ensureSdkmanager();
 
     await execa(sdkmanager, ['--update'], { env: { ANDROID_HOME: androidHome } });
 };
 
+/**
+ * Install the specified Android development tool if it is not already installed.
+ *
+ * If no version is specified for a versioned tool, the latest installed (if the tool was already installed) or
+ * available version (if it isn't installed yet) is used.
+ *
+ * The `$ANDROID_HOME` directory where the package is installed is automatically created and managed by andromatic.
+ *
+ * @param tool The tool to install, either as just its name or with an explicit version.
+ *
+ * @returns The path to the installed tool's executable.
+ */
 export const installAndroidDevTool = async (tool: AndroidTool) => {
     if (typeof tool === 'string') {
         if (tool in unversionedAndroidTools) {
@@ -189,14 +245,25 @@ export const installAndroidDevTool = async (tool: AndroidTool) => {
         throw new Error(`Unsupported tool: "${tool}"`);
     }
 
-    const { tool: toolName, version } = tool;
+    const { tool: toolName, packageVersion } = tool;
     if (!(toolName in versionedAndroidTools)) throw new Error(`Unsupported: ${toolName}`);
 
     const { package: packageName } = versionedAndroidTools[toolName];
-    await installPackages(`${packageName};${version}`);
+    await installPackages(`${packageName};${packageVersion}`);
     return getAndroidDevToolPath(tool);
 };
 
+/**
+ * Get the path to an Android development tool's executable. If the tool is not installed yet, it will automatically be
+ * installed.
+ *
+ * If no version is specified for a versioned tool, the latest installed (if the tool was already installed) or
+ * available version (if it isn't installed yet) is used.
+ *
+ * @param tool The tool to get the path for, either as just its name or with an explicit version.
+ *
+ * @returns The path to the installed tool's executable.
+ */
 export const getAndroidDevToolPath = async (tool: AndroidTool): Promise<string> => {
     const { androidHome } = await ensureSdkmanager();
 
@@ -228,16 +295,29 @@ export const getAndroidDevToolPath = async (tool: AndroidTool): Promise<string> 
         throw new Error(`Unsupported tool: "${tool}"`);
     }
 
-    const { tool: toolName, version } = tool;
+    const { tool: toolName, packageVersion } = tool;
     if (!(toolName in versionedAndroidTools)) throw new Error(`Unsupported: ${toolName}`);
 
-    const relativeToolPath = versionedAndroidTools[toolName].path(version);
+    const relativeToolPath = versionedAndroidTools[toolName].path(packageVersion);
     const toolPath = join(androidHome, relativeToolPath);
 
     if (!(await fs.exists(toolPath))) return await installAndroidDevTool(tool);
     return toolPath;
 };
 
+/**
+ * Run an Android development tool. If the tool is not installed yet, it will automatically be installed. The tool is
+ * executed using [`execa`](https://github.com/sindresorhus/execa).
+ *
+ * If no version is specified for a versioned tool, the latest installed (if the tool was already installed) or
+ * available version (if it isn't installed yet) is used.
+ *
+ * @param tool The tool to run, either as just its name or with an explicit version.
+ * @param args The arguments to pass to the command.
+ * @param execaOptions The options to pass to execa, see: https://github.com/sindresorhus/execa#options-1.
+ *
+ * @returns The result from execa, see: https://github.com/sindresorhus/execa#childprocess.
+ */
 export const runAndroidDevTool = async (tool: AndroidTool, args?: string[], execaOptions?: ExecaOptions) => {
     const { androidHome } = await ensureSdkmanager();
 
