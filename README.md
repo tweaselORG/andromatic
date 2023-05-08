@@ -111,6 +111,55 @@ Finally, andromatic provides the following more advanced functions:
 * `listPackages()` gives you an array of available packages that can be installed by `sdkmanager`, each with their path, version, and description.
 * `getAndroidDevToolPath()` returns the path to a tool's executable (and installs it if necessary) without running it.
 
+## CLI
+
+Andromatic also provides a command-line tool that you can use to install packages and tools without writing any code. Support for running tools [is planned for the future](https://github.com/tweaselORG/andromatic/issues/2).
+
+You can use the `andromatic-install` command to install packages and tools.
+
+In package mode, you can specify one or more paths to Android SDK packages that you want to install using the `-p` or `--package` option. The paths should match the ones used by `sdkmanager`. For example, to install the latest version of the command-line tools and version 29.0.1 of the build tools, you would run:
+
+```sh
+andromatic-install -p "cmdline-tools;latest" -p "build-tools;29.0.1"
+```
+
+In tool mode, you can specify the name of a tool from the Android SDK that you want to install using the `-t` or `--tool` option. Andromatic will automatically figure out which package contains the tool and install it for you. You can optionally specify a version of the package to install the tool from using the `-v` or `--package-version` option. For example, to install the `dexdump` tool from version 31.0.0 of the build tools, you can run:
+
+```sh
+andromatic-install -t dexdump -v 31.0.0
+```
+
+For more details and options, run `andromatic-install --help`:
+
+```
+andromatic-install [command]
+
+Commands:
+  andromatic-install autocomplete  generate completion script
+
+Install `sdkmanager` packages:
+  -p, --package  Path(s) to Android SDK package(s) to install.             [array]
+
+Install an individual tool:
+  -t, --tool             Tool from the Android SDK to install.            [string]
+  -v, --package-version  Version of the package to install the tool from.
+                                                                          [string]
+
+Options:
+      --help     Show help                                               [boolean]
+      --version  Show version number                                     [boolean]
+
+Examples:
+  andromatic-install                                  Install two `sdkmanager`
+    -p "system-images;android-33;google_apis;x86_64"  packages.
+    -p "platforms;android-33"   
+  andromatic-install -t aapt                          Install the latest version
+                                                      of the `aapt` tool.
+  andromatic-install -t aapt -v 30.0.3                Install the `aapt` tool from
+                                                      the `build-tools;30.0.3`
+                                                      package.
+```
+
 ## License
 
 This code is licensed under the MIT license, see the [`LICENSE`](LICENSE) file for details.

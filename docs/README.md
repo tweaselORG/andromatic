@@ -38,7 +38,7 @@ contains the tool.
 
 #### Defined in
 
-index.ts:99
+[index.ts:99](https://github.com/tweaselORG/andromatic/blob/main/src/index.ts#L99)
 
 ___
 
@@ -50,7 +50,7 @@ The name of an Android development tool, either unversioned or versioned.
 
 #### Defined in
 
-index.ts:91
+[index.ts:91](https://github.com/tweaselORG/andromatic/blob/main/src/index.ts#L91)
 
 ___
 
@@ -70,7 +70,7 @@ A package that can be installed by `sdkmanager`.
 
 #### Defined in
 
-index.ts:148
+[index.ts:148](https://github.com/tweaselORG/andromatic/blob/main/src/index.ts#L148)
 
 ## Variables
 
@@ -178,7 +178,7 @@ relative to `$ANDROID_HOME`.
 
 #### Defined in
 
-index.ts:16
+[index.ts:16](https://github.com/tweaselORG/andromatic/blob/main/src/index.ts#L16)
 
 ___
 
@@ -262,7 +262,7 @@ to `$ANDROID_HOME`.
 
 #### Defined in
 
-index.ts:62
+[index.ts:62](https://github.com/tweaselORG/andromatic/blob/main/src/index.ts#L62)
 
 ## Functions
 
@@ -290,7 +290,7 @@ The path to the installed tool's executable.
 
 #### Defined in
 
-index.ts:267
+[index.ts:267](https://github.com/tweaselORG/andromatic/blob/main/src/index.ts#L267)
 
 ___
 
@@ -319,7 +319,7 @@ The path to the installed tool's executable.
 
 #### Defined in
 
-index.ts:223
+[index.ts:223](https://github.com/tweaselORG/andromatic/blob/main/src/index.ts#L223)
 
 ___
 
@@ -344,7 +344,7 @@ The path to `$ANDROID_HOME` where the packages are installed.
 
 #### Defined in
 
-index.ts:196
+[index.ts:196](https://github.com/tweaselORG/andromatic/blob/main/src/index.ts#L196)
 
 ___
 
@@ -362,7 +362,7 @@ An array of packages, each with their package path, version and description.
 
 #### Defined in
 
-index.ts:167
+[index.ts:167](https://github.com/tweaselORG/andromatic/blob/main/src/index.ts#L167)
 
 ___
 
@@ -392,7 +392,7 @@ The result from execa, see: https://github.com/sindresorhus/execa#childprocess.
 
 #### Defined in
 
-index.ts:321
+[index.ts:321](https://github.com/tweaselORG/andromatic/blob/main/src/index.ts#L321)
 
 ___
 
@@ -408,4 +408,4 @@ Update all installed packages to the latest version using `sdkmanager`.
 
 #### Defined in
 
-index.ts:205
+[index.ts:205](https://github.com/tweaselORG/andromatic/blob/main/src/index.ts#L205)

@@ -1,5 +1,5 @@
-import semverCoerce from 'semver/functions/coerce';
-import semverCompare from 'semver/functions/compare';
+import semverCoerce from 'semver/functions/coerce.js';
+import semverCompare from 'semver/functions/compare.js';
 
 export const getLatestVersion = (versions: string[], options?: { allowPrerelease?: boolean }) =>
     [...versions]
