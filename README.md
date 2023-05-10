@@ -109,7 +109,7 @@ import { installAndroidDevTool, installPackages } from 'andromatic';
 Finally, andromatic provides the following more advanced functions:
 
 * `listPackages()` gives you an array of available packages that can be installed by `sdkmanager`, each with their path, version, and description.
-* `getAndroidDevToolPath()` returns the path to a tool's executable (and installs it if necessary) without running it.
+* `getAndroidDevToolPath()` returns the path to a tool's executable (and optionally installs it if necessary) without running it.
 
 ## CLI
 

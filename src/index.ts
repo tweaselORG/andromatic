@@ -98,35 +98,41 @@ export type AndroidToolName = keyof typeof versionedAndroidTools | keyof typeof 
  */
 export type AndroidTool = AndroidToolName | { tool: keyof typeof versionedAndroidTools; packageVersion: string };
 
-const platform = process.platform;
-if (platform !== 'win32' && platform !== 'darwin' && platform !== 'linux')
-    throw new Error(`Unsupported platform: "${platform}"`);
+const ensureSdkmanager = async (options?: { ensureLicenses?: boolean }) => {
+    // Google only provides the command-line tools binaries for Windows, macOS, and Linux.
+    const platform = process.platform;
+    if (platform !== 'win32' && platform !== 'darwin' && platform !== 'linux')
+        throw new Error(`Unsupported platform: "${platform}"`);
 
-const ensureSdkmanager = async () => {
     const androidHome = await globalCacheDir('andromatic');
 
     // Create license files just like Debian and Ubuntu do, see:
     // https://github.com/tweaselORG/meta/issues/26#issuecomment-1535036229
-    const licensesDir = join(androidHome, 'licenses');
-    await fs.mkdir(licensesDir, { recursive: true });
-    const licenseHashes = {
-        'android-googletv-license': '601085b94cd77f0b54ff86406957099ebe79c4d6',
-        'android-sdk-arm-dbt-license': '859f317696f67ef3d7f30a50a5560e7834b43903',
-        'android-sdk-license': '24333f8a63b6825ea9c5514f83c2829b004d1fee',
-        'android-sdk-preview-license': '84831b9409646a918e30573bab4c9c91346d8abd',
-        'google-gdk-license': '33b6a2b64607f11b759f320ef9dff4ae5c47d97a',
-        'mips-android-sysimage-license': 'e9acab5b5fbb560a72cfaecce8946896ff6aab9d',
+    const createLicenseFiles = async () => {
+        const licensesDir = join(androidHome, 'licenses');
+        await fs.mkdir(licensesDir, { recursive: true });
+        const licenseHashes = {
+            'android-googletv-license': '601085b94cd77f0b54ff86406957099ebe79c4d6',
+            'android-sdk-arm-dbt-license': '859f317696f67ef3d7f30a50a5560e7834b43903',
+            'android-sdk-license': '24333f8a63b6825ea9c5514f83c2829b004d1fee',
+            'android-sdk-preview-license': '84831b9409646a918e30573bab4c9c91346d8abd',
+            'google-gdk-license': '33b6a2b64607f11b759f320ef9dff4ae5c47d97a',
+            'mips-android-sysimage-license': 'e9acab5b5fbb560a72cfaecce8946896ff6aab9d',
+        };
+        for (const [license, hash] of Object.entries(licenseHashes)) {
+            const licenseFile = join(licensesDir, license);
+            await fs.writeFile(licenseFile, hash);
+        }
     };
-    for (const [license, hash] of Object.entries(licenseHashes)) {
-        const licenseFile = join(licensesDir, license);
-        await fs.writeFile(licenseFile, hash);
-    }
+    if (options?.ensureLicenses) await createLicenseFiles();
 
     const cmdlineToolsDir = join(androidHome, 'cmdline-tools');
     const sdkmanager = join(cmdlineToolsDir, 'latest', 'bin', 'sdkmanager');
 
     // Download cmdline-tools to get sdkmanager.
     if (!(await fs.exists(sdkmanager))) {
+        await createLicenseFiles();
+
         const cmdlineToolsUrls = {
             win32: 'https://dl.google.com/android/repository/commandlinetools-win-9477386_latest.zip',
             darwin: 'https://dl.google.com/android/repository/commandlinetools-mac-9477386_latest.zip',
@@ -194,7 +200,7 @@ export const listPackages = async (): Promise<AvailablePackage[]> => {
  * @returns The path to `$ANDROID_HOME` where the packages are installed.
  */
 export const installPackages = async (...packages: string[]) => {
-    const { androidHome, sdkmanager } = await ensureSdkmanager();
+    const { androidHome, sdkmanager } = await ensureSdkmanager({ ensureLicenses: true });
 
     await execa(sdkmanager, packages, { env: { ANDROID_HOME: androidHome } });
 
@@ -203,7 +209,7 @@ export const installPackages = async (...packages: string[]) => {
 
 /** Update all installed packages to the latest version using `sdkmanager`. */
 export const updatePackages = async () => {
-    const { androidHome, sdkmanager } = await ensureSdkmanager();
+    const { androidHome, sdkmanager } = await ensureSdkmanager({ ensureLicenses: true });
 
     await execa(sdkmanager, ['--update'], { env: { ANDROID_HOME: androidHome } });
 };
@@ -225,7 +231,7 @@ export const installAndroidDevTool = async (tool: AndroidTool) => {
         if (tool in unversionedAndroidTools) {
             const { package: packageName } = unversionedAndroidTools[tool as keyof typeof unversionedAndroidTools];
             await installPackages(packageName);
-            return getAndroidDevToolPath(tool);
+            return getAndroidDevToolPath(tool, { installIfNecessary: false });
         } else if (tool in versionedAndroidTools) {
             const { package: packageName } = versionedAndroidTools[tool as keyof typeof versionedAndroidTools];
 
@@ -239,39 +245,49 @@ export const installAndroidDevTool = async (tool: AndroidTool) => {
             if (!latestVersion) throw new Error(`No installable package found for: ${tool}`);
 
             await installPackages(`${packageName};${latestVersion}`);
-            return getAndroidDevToolPath(tool);
+            return getAndroidDevToolPath(tool, { installIfNecessary: false });
         }
 
         throw new Error(`Unsupported tool: "${tool}"`);
     }
 
     const { tool: toolName, packageVersion } = tool;
-    if (!(toolName in versionedAndroidTools)) throw new Error(`Unsupported: ${toolName}`);
+    if (!(toolName in versionedAndroidTools)) throw new Error(`Unsupported tool: ${toolName}@${packageVersion}`);
 
     const { package: packageName } = versionedAndroidTools[toolName];
     await installPackages(`${packageName};${packageVersion}`);
-    return getAndroidDevToolPath(tool);
+    return getAndroidDevToolPath(tool, { installIfNecessary: false });
 };
 
 /**
  * Get the path to an Android development tool's executable. If the tool is not installed yet, it will automatically be
- * installed.
+ * installed (unless you set `options.installIfNecessary` to `false`.
  *
  * If no version is specified for a versioned tool, the latest installed (if the tool was already installed) or
  * available version (if it isn't installed yet) is used.
  *
  * @param tool The tool to get the path for, either as just its name or with an explicit version.
+ * @param options Optional options to control the behaviour of this function, where:
+ *
+ *   - `installIfNecessary`: Whether to automatically install the tool if it is not already installed. Defaults to `true`.
  *
  * @returns The path to the installed tool's executable.
  */
-export const getAndroidDevToolPath = async (tool: AndroidTool): Promise<string> => {
+export const getAndroidDevToolPath = async (
+    tool: AndroidTool,
+    options?: { installIfNecessary?: boolean }
+): Promise<string> => {
     const { androidHome } = await ensureSdkmanager();
+    const install = async (tool: AndroidTool) => {
+        if (options?.installIfNecessary ?? true) return await installAndroidDevTool(tool);
+        throw new Error(`Tool not installed: "${tool}"`);
+    };
 
     if (typeof tool === 'string') {
         if (tool in unversionedAndroidTools) {
             const relativeToolPath = unversionedAndroidTools[tool as keyof typeof unversionedAndroidTools].path;
             const toolPath = join(androidHome, relativeToolPath);
-            if (!(await fs.exists(toolPath))) return await installAndroidDevTool(tool);
+            if (!(await fs.exists(toolPath))) return install(tool);
             return toolPath;
         } else if (tool in versionedAndroidTools) {
             const relativeGlobToolPath = versionedAndroidTools[tool as keyof typeof versionedAndroidTools].path('*');
@@ -284,7 +300,7 @@ export const getAndroidDevToolPath = async (tool: AndroidTool): Promise<string> 
                 .filter((v): v is string => !!v);
             const latestVersion = getLatestVersion(installedVersions);
 
-            if (!latestVersion) return await installAndroidDevTool(tool);
+            if (!latestVersion) return install(tool);
 
             return join(
                 androidHome,
@@ -296,12 +312,12 @@ export const getAndroidDevToolPath = async (tool: AndroidTool): Promise<string> 
     }
 
     const { tool: toolName, packageVersion } = tool;
-    if (!(toolName in versionedAndroidTools)) throw new Error(`Unsupported: ${toolName}`);
+    if (!(toolName in versionedAndroidTools)) throw new Error(`Unsupported tool: ${toolName}@${packageVersion}`);
 
     const relativeToolPath = versionedAndroidTools[toolName].path(packageVersion);
     const toolPath = join(androidHome, relativeToolPath);
 
-    if (!(await fs.exists(toolPath))) return await installAndroidDevTool(tool);
+    if (!(await fs.exists(toolPath))) return install(tool);
     return toolPath;
 };
 
