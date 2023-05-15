@@ -1,7 +1,7 @@
 {
     "name": "andromatic",
     "version": "0.0.0",
-    "description": "Automate the installation and running of the Android developer tools.",
+    "description": "Automate the installation and running of the Android developer tools on Windows, macOS, and Linux.",
     "bugs": "https://github.com/tweaselORG/andromatic/issues",
     "repository": {
         "type": "git",

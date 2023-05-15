@@ -1,8 +1,8 @@
 # andromatic
 
-> Automate the installation and running of the Android developer tools.
+> Automate the installation and running of the Android developer tools on Windows, macOS, and Linux.
 
-Andromatic is a Node.js module that automates the installation and usage of the [Android development tools](https://developer.android.com/tools) that are distributed as part of the Android SDK, such as `adb`, `emulator`, `dexdump`, `aapt`, `cmake`, etc. It automatically downloads and manages the required packages for you on demand using `sdkmanager`, and provides functions to get the path or run any tool with a given version. It also automatically downloads a suitable version of Java if it isn't installed already. This is especially useful if you are writing a library that depends on (some of) these tools but don't want your users to have to install them manually.
+Andromatic is a Node.js module that automates the installation and usage of the [Android development tools](https://developer.android.com/tools) that are distributed as part of the Android SDK, such as `adb`, `emulator`, `dexdump`, `aapt`, `cmake`, etc. on Windows, macOS, and Linux. It automatically downloads and manages the required packages for you on demand using `sdkmanager`, and provides functions to get the path or run any tool with a given version. It also automatically downloads a suitable version of Java if it isn't installed already. This is especially useful if you are writing a library that depends on (some of) these tools but don't want your users to have to install them manually.
 
 In particular, andromatic can install and run the tools from the following SDK packages for you:
 
