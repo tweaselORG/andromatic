@@ -106,7 +106,11 @@ const ensureJavaHome = async (options?: { install?: boolean }): Promise<string> 
     const javaVersion = 17;
     const javaCacheDir = await globalCacheDir('andromatic-java');
 
-    const existingBinaries = (await globby(`jdk-${javaVersion}*-jre/bin/java`, { cwd: join(javaCacheDir, 'jre') }))
+    const existingBinaries = (
+        await globby(`jdk-${javaVersion}*-jre/bin/java${process.platform === 'win32' ? '.exe' : ''}`, {
+            cwd: join(javaCacheDir, 'jre'),
+        })
+    )
         .sort()
         .reverse();
     const latestExistingJavaHome = existingBinaries[0]?.split('/')[0];
