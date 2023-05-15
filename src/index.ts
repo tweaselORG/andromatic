@@ -119,14 +119,22 @@ const ensureJavaHome = async (options?: { install?: boolean }): Promise<string> 
     const javaCacheDir = await globalCacheDir('andromatic-java');
 
     const existingBinaries = (
-        await globby(`jdk-${javaVersion}*-jre/bin/java${process.platform === 'win32' ? '.exe' : ''}`, {
-            cwd: join(javaCacheDir, 'jre'),
-        })
+        await globby(
+            process.platform === 'win32'
+                ? `jdk-${javaVersion}*-jre/bin/java.exe`
+                : process.platform === 'darwin'
+                ? `jdk-${javaVersion}*-jre/Contents/Home/bin/java`
+                : `jdk-${javaVersion}*-jre/bin/java`,
+            { cwd: join(javaCacheDir, 'jre') }
+        )
     )
         .sort()
         .reverse();
     const latestExistingJavaHome = existingBinaries[0]?.split('/')[0];
-    if (latestExistingJavaHome) return join(javaCacheDir, 'jre', latestExistingJavaHome);
+    if (latestExistingJavaHome)
+        return process.platform === 'darwin'
+            ? join(javaCacheDir, 'jre', latestExistingJavaHome, 'Contents', 'Home')
+            : join(javaCacheDir, 'jre', latestExistingJavaHome);
 
     if (options?.install === false) throw new Error(`No Java installation found.`);
 
