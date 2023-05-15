@@ -5,8 +5,9 @@ import { execa } from 'execa';
 import fs from 'fs-extra';
 import globalCacheDir from 'global-cache-dir';
 import { globby } from 'globby';
+import { install } from 'node-java-connector';
 import { join } from 'path';
-import { getLatestVersion } from './util';
+import { findJavaHome, getLatestVersion } from './util';
 
 /* eslint-disable camelcase */
 /**
@@ -98,6 +99,31 @@ export type AndroidToolName = keyof typeof versionedAndroidTools | keyof typeof 
  */
 export type AndroidTool = AndroidToolName | { tool: keyof typeof versionedAndroidTools; packageVersion: string };
 
+const ensureJavaHome = async (options?: { install?: boolean }): Promise<string> => {
+    const systemJavaHome = await findJavaHome({ allowJre: true });
+    if (systemJavaHome) return systemJavaHome;
+
+    const javaVersion = 17;
+    const javaCacheDir = await globalCacheDir('andromatic-java');
+
+    const existingBinaries = (await globby(`jdk-${javaVersion}*-jre/bin/java`, { cwd: join(javaCacheDir, 'jre') }))
+        .sort()
+        .reverse();
+    const latestExistingJavaHome = existingBinaries[0]?.split('/')[0];
+    if (latestExistingJavaHome) return join(javaCacheDir, 'jre', latestExistingJavaHome);
+
+    if (options?.install === false) throw new Error(`No Java installation found.`);
+
+    // Annoyingly, node-java-connector _actually_ installs in `$installPath/..`.
+    const installPath = join(javaCacheDir, 'foo');
+    await fs.mkdir(installPath, { recursive: true });
+
+    // eslint-disable-next-line camelcase
+    await install({ feature_version: javaVersion, install_path: installPath });
+    // node-java-connector doesn't return the full path to the Java home.
+    return ensureJavaHome({ install: false });
+};
+
 const ensureSdkmanager = async (options?: { ensureLicenses?: boolean }) => {
     // Google only provides the command-line tools binaries for Windows, macOS, and Linux.
     const platform = process.platform;
@@ -105,6 +131,7 @@ const ensureSdkmanager = async (options?: { ensureLicenses?: boolean }) => {
         throw new Error(`Unsupported platform: "${platform}"`);
 
     const androidHome = await globalCacheDir('andromatic');
+    const javaHome = await ensureJavaHome();
 
     // Create license files just like Debian and Ubuntu do, see:
     // https://github.com/tweaselORG/meta/issues/26#issuecomment-1535036229
@@ -148,7 +175,7 @@ const ensureSdkmanager = async (options?: { ensureLicenses?: boolean }) => {
         await fs.rename(join(cmdlineToolsDir, 'cmdline-tools'), join(cmdlineToolsDir, 'latest'));
     }
 
-    return { androidHome, sdkmanager };
+    return { androidHome, javaHome, sdkmanager, env: { ANDROID_HOME: androidHome, JAVA_HOME: javaHome } };
 };
 
 /** A package that can be installed by `sdkmanager`. */
@@ -172,9 +199,9 @@ export type AvailablePackage = {
  * @returns An array of packages, each with their package path, version and description.
  */
 export const listPackages = async (): Promise<AvailablePackage[]> => {
-    const { androidHome, sdkmanager } = await ensureSdkmanager();
+    const { sdkmanager, env } = await ensureSdkmanager();
 
-    const { stdout } = await execa(sdkmanager, ['--list'], { env: { ANDROID_HOME: androidHome } });
+    const { stdout } = await execa(sdkmanager, ['--list'], { env });
 
     const lines = stdout.split('\n');
     /*
@@ -201,18 +228,18 @@ export const listPackages = async (): Promise<AvailablePackage[]> => {
  * @returns The path to `$ANDROID_HOME` where the packages are installed.
  */
 export const installPackages = async (...packages: string[]) => {
-    const { androidHome, sdkmanager } = await ensureSdkmanager({ ensureLicenses: true });
+    const { androidHome, sdkmanager, env } = await ensureSdkmanager({ ensureLicenses: true });
 
-    await execa(sdkmanager, packages, { env: { ANDROID_HOME: androidHome } });
+    await execa(sdkmanager, packages, { env });
 
     return androidHome;
 };
 
 /** Update all installed packages to the latest version using `sdkmanager`. */
 export const updatePackages = async () => {
-    const { androidHome, sdkmanager } = await ensureSdkmanager({ ensureLicenses: true });
+    const { sdkmanager, env } = await ensureSdkmanager({ ensureLicenses: true });
 
-    await execa(sdkmanager, ['--update'], { env: { ANDROID_HOME: androidHome } });
+    await execa(sdkmanager, ['--update'], { env });
 };
 
 /**
@@ -336,8 +363,8 @@ export const getAndroidDevToolPath = async (
  * @returns The result from execa, see: https://github.com/sindresorhus/execa#childprocess.
  */
 export const runAndroidDevTool = async (tool: AndroidTool, args?: string[], execaOptions?: ExecaOptions) => {
-    const { androidHome } = await ensureSdkmanager();
+    const { env } = await ensureSdkmanager();
 
     const toolPath = await getAndroidDevToolPath(tool);
-    return execa(toolPath, args, { ...execaOptions, env: { ANDROID_HOME: androidHome, ...execaOptions?.env } });
+    return execa(toolPath, args, { ...execaOptions, env: { ...env, ...execaOptions?.env } });
 };

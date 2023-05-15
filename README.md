@@ -2,7 +2,7 @@
 
 > Automate the installation and running of the Android developer tools.
 
-Andromatic is a Node.js module that automates the installation and usage of the [Android development tools](https://developer.android.com/tools) that are distributed as part of the Android SDK, such as `adb`, `emulator`, `dexdump`, `aapt`, `cmake`, etc. It automatically downloads and manages the required packages for you on demand using `sdkmanager`, and provides functions to get the path or run any tool with a given version. This is especially useful if you are writing a library that depends on (some of) these tools but don't want your users to have to install them manually.
+Andromatic is a Node.js module that automates the installation and usage of the [Android development tools](https://developer.android.com/tools) that are distributed as part of the Android SDK, such as `adb`, `emulator`, `dexdump`, `aapt`, `cmake`, etc. It automatically downloads and manages the required packages for you on demand using `sdkmanager`, and provides functions to get the path or run any tool with a given version. It also automatically downloads a suitable version of Java if it isn't installed already. This is especially useful if you are writing a library that depends on (some of) these tools but don't want your users to have to install them manually.
 
 In particular, andromatic can install and run the tools from the following SDK packages for you:
 
@@ -19,7 +19,7 @@ A few things to keep in mind:
 
 * If you want to work with physical devices, [additional setup steps may be necessary depending on your system](https://developer.android.com/studio/run/device#setting-up). Andromatic doesn't automate those. On Ubuntu, you need to be a member of the `plugdev` group (`sudo usermod -aG plugdev <username>`) and have `udev` rules for your device (`sudo apt install android-sdk-platform-tools-common`). For other distributions, see [android-udev-rules](https://github.com/M0Rf30/android-udev-rules).
 * The binaries downloaded by andromatic are released by Google under proprietary licenses that you need to follow. See especially the [Android Software Development Kit License Agreement](https://developer.android.com/studio/terms).
-* Andromatic is a wrapper around Google's `sdkmanager`. It downloads the packages from `https://dl.google.com`. Be aware of the privacy implications.
+* Andromatic is a wrapper around Google's `sdkmanager`, it downloads the packages from `https://dl.google.com`. If no Java installation was found, it downloads binaries from the [Adoptium](https://adoptium.net/) project. Be aware of the privacy implications.
 
 ## Installation
 

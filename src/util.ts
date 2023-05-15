@@ -1,5 +1,7 @@
+import _findJavaHome from 'find-java-home';
 import semverCoerce from 'semver/functions/coerce.js';
 import semverCompare from 'semver/functions/compare.js';
+import { promisify } from 'util';
 
 export const getLatestVersion = (versions: string[], options?: { allowPrerelease?: boolean }) =>
     [...versions]
@@ -16,3 +18,5 @@ export const getLatestVersion = (versions: string[], options?: { allowPrerelease
             throw new Error(`Invalid version: ${a} or ${b}`);
         })
         .pop();
+
+export const findJavaHome = promisify(_findJavaHome) as (options?: { allowJre?: boolean }) => Promise<string>;
