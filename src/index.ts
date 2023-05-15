@@ -162,6 +162,9 @@ const ensureSdkmanager = async (options?: { ensureLicenses?: boolean }) => {
 
     // Download cmdline-tools to get sdkmanager.
     if (!(await fs.exists(sdkmanager))) {
+        // If a previous installation failed, remove the directory.
+        await fs.remove(cmdlineToolsDir);
+
         // If `options?.ensureLicenses` is `true`, we already created the license files above.
         if (!options?.ensureLicenses) await createLicenseFiles();
 
