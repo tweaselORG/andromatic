@@ -15,12 +15,12 @@ import { findJavaHome, getLatestVersion } from './util';
  * relative to `$ANDROID_HOME`.
  */
 export const unversionedAndroidTools = {
-    nimble_bridge: { path: 'emulator/nimble_bridge', package: 'emulator' },
+    nimble_bridge: { path: 'emulator/nimble_bridge', windowsExtension: 'exe', package: 'emulator' },
     'goldfish-webrtc-bridge': { path: 'emulator/goldfish-webrtc-bridge', package: 'emulator' },
-    'qemu-img': { path: 'emulator/qemu-img', package: 'emulator' },
-    'emulator-check': { path: 'emulator/emulator-check', package: 'emulator' },
-    qsn: { path: 'emulator/qsn', package: 'emulator' },
-    emulator: { path: 'emulator/emulator', package: 'emulator' },
+    'qemu-img': { path: 'emulator/qemu-img', windowsExtension: 'exe', package: 'emulator' },
+    'emulator-check': { path: 'emulator/emulator-check', windowsExtension: 'exe', package: 'emulator' },
+    qsn: { path: 'emulator/qsn', windowsExtension: 'exe', package: 'emulator' },
+    emulator: { path: 'emulator/emulator', windowsExtension: 'exe', package: 'emulator' },
     'qemu-system-armel': { path: 'emulator/qemu/linux-x86_64/qemu-system-armel', package: 'emulator' },
     'qemu-system-x86_64-headless': {
         path: 'emulator/qemu/linux-x86_64/qemu-system-x86_64-headless',
@@ -38,54 +38,66 @@ export const unversionedAndroidTools = {
         package: 'emulator',
     },
     'qemu-system-x86_64': { path: 'emulator/qemu/linux-x86_64/qemu-system-x86_64', package: 'emulator' },
-    mksdcard: { path: 'emulator/mksdcard', package: 'emulator' },
-    crashpad_handler: { path: 'emulator/crashpad_handler', package: 'emulator' },
+    mksdcard: { path: 'emulator/mksdcard', windowsExtension: 'exe', package: 'emulator' },
+    crashpad_handler: { path: 'emulator/crashpad_handler', windowsExtension: 'exe', package: 'emulator' },
     'fsck.ext4': { path: 'emulator/bin64/fsck.ext4', package: 'emulator' },
-    e2fsck: { path: 'emulator/bin64/e2fsck', package: 'emulator' },
-    tune2fs: { path: 'emulator/bin64/tune2fs', package: 'emulator' },
+    e2fsck: { path: 'emulator/bin64/e2fsck', windowsExtension: 'exe', package: 'emulator' },
+    tune2fs: { path: 'emulator/bin64/tune2fs', windowsExtension: 'exe', package: 'emulator' },
     'mkfs.ext4': { path: 'emulator/bin64/mkfs.ext4', package: 'emulator' },
-    resize2fs: { path: 'emulator/bin64/resize2fs', package: 'emulator' },
+    resize2fs: { path: 'emulator/bin64/resize2fs', windowsExtension: 'exe', package: 'emulator' },
 
-    'hprof-conv': { path: 'platform-tools/hprof-conv', package: 'platform-tools' },
-    adb: { path: 'platform-tools/adb', package: 'platform-tools' },
-    fastboot: { path: 'platform-tools/fastboot', package: 'platform-tools' },
-    dmtracedump: { path: 'platform-tools/dmtracedump', package: 'platform-tools' },
-    make_f2fs_casefold: { path: 'platform-tools/make_f2fs_casefold', package: 'platform-tools' },
-    etc1tool: { path: 'platform-tools/etc1tool', package: 'platform-tools' },
-    sqlite3: { path: 'platform-tools/sqlite3', package: 'platform-tools' },
-    mke2fs: { path: 'platform-tools/mke2fs', package: 'platform-tools' },
-    make_f2fs: { path: 'platform-tools/make_f2fs', package: 'platform-tools' },
-} as const;
+    'hprof-conv': { path: 'platform-tools/hprof-conv', windowsExtension: 'exe', package: 'platform-tools' },
+    adb: { path: 'platform-tools/adb', windowsExtension: 'exe', package: 'platform-tools' },
+    fastboot: { path: 'platform-tools/fastboot', windowsExtension: 'exe', package: 'platform-tools' },
+    dmtracedump: { path: 'platform-tools/dmtracedump', windowsExtension: 'exe', package: 'platform-tools' },
+    make_f2fs_casefold: {
+        path: 'platform-tools/make_f2fs_casefold',
+        windowsExtension: 'exe',
+        package: 'platform-tools',
+    },
+    etc1tool: { path: 'platform-tools/etc1tool', windowsExtension: 'exe', package: 'platform-tools' },
+    sqlite3: { path: 'platform-tools/sqlite3', windowsExtension: 'exe', package: 'platform-tools' },
+    mke2fs: { path: 'platform-tools/mke2fs', windowsExtension: 'exe', package: 'platform-tools' },
+    make_f2fs: { path: 'platform-tools/make_f2fs', windowsExtension: 'exe', package: 'platform-tools' },
+} as const satisfies Record<string, { path: string; windowsExtension?: string; package: string }>;
 /**
  * A map of versioned Android development tools and their corresponding package names and paths to their binary relative
  * to `$ANDROID_HOME`.
  */
 export const versionedAndroidTools = {
-    aapt: { path: (v) => `build-tools/${v}/aapt`, package: 'build-tools' },
-    'split-select': { path: (v) => `build-tools/${v}/split-select`, package: 'build-tools' },
-    zipalign: { path: (v) => `build-tools/${v}/zipalign`, package: 'build-tools' },
-    bcc_compat: { path: (v) => `build-tools/${v}/bcc_compat`, package: 'build-tools' },
-    dexdump: { path: (v) => `build-tools/${v}/dexdump`, package: 'build-tools' },
-    aidl: { path: (v) => `build-tools/${v}/aidl`, package: 'build-tools' },
-    lld: { path: (v) => `build-tools/${v}/lld`, package: 'build-tools' },
-    aapt2: { path: (v) => `build-tools/${v}/aapt2`, package: 'build-tools' },
-    'llvm-rs-cc': { path: (v) => `build-tools/${v}/llvm-rs-cc`, package: 'build-tools' },
-    apksigner: { path: (v) => `build-tools/${v}/apksigner`, package: 'build-tools' },
-    d8: { path: (v) => `build-tools/${v}/d8`, package: 'build-tools' },
+    aapt: { path: (v) => `build-tools/${v}/aapt`, windowsExtension: 'exe', package: 'build-tools' },
+    'split-select': { path: (v) => `build-tools/${v}/split-select`, windowsExtension: 'exe', package: 'build-tools' },
+    zipalign: { path: (v) => `build-tools/${v}/zipalign`, windowsExtension: 'exe', package: 'build-tools' },
+    bcc_compat: { path: (v) => `build-tools/${v}/bcc_compat`, windowsExtension: 'exe', package: 'build-tools' },
+    dexdump: { path: (v) => `build-tools/${v}/dexdump`, windowsExtension: 'exe', package: 'build-tools' },
+    aidl: { path: (v) => `build-tools/${v}/aidl`, windowsExtension: 'exe', package: 'build-tools' },
+    lld: { path: (v) => `build-tools/${v}/lld`, windowsExtension: 'exe', package: 'build-tools' },
+    aapt2: { path: (v) => `build-tools/${v}/aapt2`, windowsExtension: 'exe', package: 'build-tools' },
+    'llvm-rs-cc': { path: (v) => `build-tools/${v}/llvm-rs-cc`, windowsExtension: 'exe', package: 'build-tools' },
+    apksigner: { path: (v) => `build-tools/${v}/apksigner`, windowsExtension: 'bat', package: 'build-tools' },
+    d8: { path: (v) => `build-tools/${v}/d8`, windowsExtension: 'bat', package: 'build-tools' },
 
-    cmake: { path: (v) => `cmake/${v}/bin/cmake`, package: 'cmake' },
-    cpack: { path: (v) => `cmake/${v}/bin/cpack`, package: 'cmake' },
-    ninja: { path: (v) => `cmake/${v}/bin/ninja`, package: 'cmake' },
-    ctest: { path: (v) => `cmake/${v}/bin/ctest`, package: 'cmake' },
+    cmake: { path: (v) => `cmake/${v}/bin/cmake`, windowsExtension: 'exe', package: 'cmake' },
+    cpack: { path: (v) => `cmake/${v}/bin/cpack`, windowsExtension: 'exe', package: 'cmake' },
+    ninja: { path: (v) => `cmake/${v}/bin/ninja`, windowsExtension: 'exe', package: 'cmake' },
+    ctest: { path: (v) => `cmake/${v}/bin/ctest`, windowsExtension: 'exe', package: 'cmake' },
 
-    screenshot2: { path: (v) => `cmdline-tools/${v}/bin/screenshot2`, package: 'cmdline-tools' },
-    apkanalyzer: { path: (v) => `cmdline-tools/${v}/bin/apkanalyzer`, package: 'cmdline-tools' },
-    profgen: { path: (v) => `cmdline-tools/${v}/bin/profgen`, package: 'cmdline-tools' },
-    retrace: { path: (v) => `cmdline-tools/${v}/bin/retrace`, package: 'cmdline-tools' },
-    avdmanager: { path: (v) => `cmdline-tools/${v}/bin/avdmanager`, package: 'cmdline-tools' },
-    lint: { path: (v) => `cmdline-tools/${v}/bin/lint`, package: 'cmdline-tools' },
-    sdkmanager: { path: (v) => `cmdline-tools/${v}/bin/sdkmanager`, package: 'cmdline-tools' },
-} as const satisfies Record<string, { path: (version: string) => string; package: string }>;
+    screenshot2: {
+        path: (v) => `cmdline-tools/${v}/bin/screenshot2`,
+        windowsExtension: 'bat',
+        package: 'cmdline-tools',
+    },
+    apkanalyzer: {
+        path: (v) => `cmdline-tools/${v}/bin/apkanalyzer`,
+        windowsExtension: 'bat',
+        package: 'cmdline-tools',
+    },
+    profgen: { path: (v) => `cmdline-tools/${v}/bin/profgen`, windowsExtension: 'bat', package: 'cmdline-tools' },
+    retrace: { path: (v) => `cmdline-tools/${v}/bin/retrace`, windowsExtension: 'bat', package: 'cmdline-tools' },
+    avdmanager: { path: (v) => `cmdline-tools/${v}/bin/avdmanager`, windowsExtension: 'bat', package: 'cmdline-tools' },
+    lint: { path: (v) => `cmdline-tools/${v}/bin/lint`, windowsExtension: 'bat', package: 'cmdline-tools' },
+    sdkmanager: { path: (v) => `cmdline-tools/${v}/bin/sdkmanager`, windowsExtension: 'bat', package: 'cmdline-tools' },
+} as const satisfies Record<string, { path: (version: string) => string; windowsExtension?: string; package: string }>;
 /* eslint-enable camelcase */
 
 /** The name of an Android development tool, either unversioned or versioned. */
@@ -158,7 +170,12 @@ const ensureSdkmanager = async (options?: { ensureLicenses?: boolean }) => {
     if (options?.ensureLicenses) await createLicenseFiles();
 
     const cmdlineToolsDir = join(androidHome, 'cmdline-tools');
-    const sdkmanager = join(cmdlineToolsDir, 'latest', 'bin', 'sdkmanager');
+    const sdkmanager = join(
+        cmdlineToolsDir,
+        'latest',
+        'bin',
+        process.platform === 'win32' ? 'sdkmanager.bat' : 'sdkmanager'
+    );
 
     // Download cmdline-tools to get sdkmanager.
     if (!(await fs.exists(sdkmanager))) {
@@ -318,16 +335,27 @@ export const getAndroidDevToolPath = async (
         throw new Error(`Tool not installed: "${tool}"`);
     };
 
+    const getRelativePath = (type: 'versioned' | 'unversioned', tool: AndroidToolName, version?: string) => {
+        const toolData =
+            type === 'versioned'
+                ? versionedAndroidTools[tool as keyof typeof versionedAndroidTools]
+                : unversionedAndroidTools[tool as keyof typeof unversionedAndroidTools];
+        const basePath =
+            version && typeof toolData.path === 'function' ? toolData.path(version) : (toolData.path as string);
+        return process.platform === 'win32' && 'windowsExtension' in toolData
+            ? `${basePath}.${toolData.windowsExtension}`
+            : basePath;
+    };
+
     if (typeof tool === 'string') {
         if (tool in unversionedAndroidTools) {
-            const relativeToolPath = unversionedAndroidTools[tool as keyof typeof unversionedAndroidTools].path;
+            const relativeToolPath = getRelativePath('unversioned', tool);
             const toolPath = join(androidHome, relativeToolPath);
             if (!(await fs.exists(toolPath))) return install(tool);
             return toolPath;
         } else if (tool in versionedAndroidTools) {
-            const relativeGlobToolPath = versionedAndroidTools[tool as keyof typeof versionedAndroidTools].path('*');
-            const relativeRegexToolPath =
-                versionedAndroidTools[tool as keyof typeof versionedAndroidTools].path('(.+)');
+            const relativeGlobToolPath = getRelativePath('versioned', tool, '*');
+            const relativeRegexToolPath = getRelativePath('versioned', tool, '(.+)');
 
             const installedTools = await globby(relativeGlobToolPath, { cwd: androidHome });
             const installedVersions = installedTools
@@ -337,10 +365,7 @@ export const getAndroidDevToolPath = async (
 
             if (!latestVersion) return install(tool);
 
-            return join(
-                androidHome,
-                versionedAndroidTools[tool as keyof typeof versionedAndroidTools].path(latestVersion)
-            );
+            return join(androidHome, getRelativePath('versioned', tool, latestVersion));
         }
 
         throw new Error(`Unsupported tool: "${tool}"`);
@@ -349,7 +374,7 @@ export const getAndroidDevToolPath = async (
     const { tool: toolName, packageVersion } = tool;
     if (!(toolName in versionedAndroidTools)) throw new Error(`Unsupported tool: ${toolName}@${packageVersion}`);
 
-    const relativeToolPath = versionedAndroidTools[toolName].path(packageVersion);
+    const relativeToolPath = getRelativePath('versioned', toolName, packageVersion);
     const toolPath = join(androidHome, relativeToolPath);
 
     if (!(await fs.exists(toolPath))) return install(tool);
