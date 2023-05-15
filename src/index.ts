@@ -131,7 +131,8 @@ const ensureSdkmanager = async (options?: { ensureLicenses?: boolean }) => {
 
     // Download cmdline-tools to get sdkmanager.
     if (!(await fs.exists(sdkmanager))) {
-        await createLicenseFiles();
+        // If `options?.ensureLicenses` is `true`, we already created the license files above.
+        if (!options?.ensureLicenses) await createLicenseFiles();
 
         const cmdlineToolsUrls = {
             win32: 'https://dl.google.com/android/repository/commandlinetools-win-9477386_latest.zip',
