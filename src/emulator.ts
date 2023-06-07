@@ -89,9 +89,10 @@ export const createEmulator = async (name: string, options: EmulatorOptions) => 
         : `system-images;android-${options.apiLevel};${options.variant};${options.architecture}`;
 
     if (!(await fs.pathExists(join(androidHome, ...pkg.split(';'), 'system.img')))) await installPackages(pkg);
-    // The `emulator` checks for this directory but doesn't actually need anything in it (see
+    // The `emulator` checks for these directories but doesn't actually need anything in them (see
     // https://github.com/tweaselORG/andromatic/pull/5#issuecomment-1581526280).
-    if (!(await fs.pathExists(join(androidHome, 'platforms')))) await fs.ensureDir(join(androidHome, 'platforms'));
+    for (const dir of ['platforms', 'platform-tools'])
+        if (!(await fs.pathExists(join(androidHome, dir)))) await fs.ensureDir(join(androidHome, dir));
 
     await runAndroidDevTool('avdmanager', [
         'create',
