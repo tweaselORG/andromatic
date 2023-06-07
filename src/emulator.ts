@@ -14,7 +14,7 @@ import { ensureSdkmanager, installPackages, runAndroidDevTool } from './index';
 export type EmulatorOptions = MergeExclusive<
     {
         /**
-         * The package name of the system image to use for the emulator (as understood by `sdkmanager`.
+         * The package name of the system image to use for the emulator (as understood by `sdkmanager`).
          *
          * @example `system-images;android-30;google_apis;x86_64`
          */
