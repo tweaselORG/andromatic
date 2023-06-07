@@ -1,4 +1,5 @@
 import fs from 'fs-extra';
+import { join } from 'path';
 import type { MergeExclusive } from 'type-fest';
 import { ensureSdkmanager, installPackages, runAndroidDevTool } from './index';
 
@@ -87,7 +88,10 @@ export const createEmulator = async (name: string, options: EmulatorOptions) => 
         ? options.package
         : `system-images;android-${options.apiLevel};${options.variant};${options.architecture}`;
 
-    if (!(await fs.pathExists(`${androidHome}/${pkg.split(';').join('/')}/system.img`))) await installPackages(pkg);
+    if (!(await fs.pathExists(join(androidHome, ...pkg.split(';'), 'system.img')))) await installPackages(pkg);
+    // The `emulator` checks for this directory but doesn't actually need anything in it (see
+    // https://github.com/tweaselORG/andromatic/pull/5#issuecomment-1581526280).
+    if (!(await fs.pathExists(join(androidHome, 'platforms')))) await fs.ensureDir(join(androidHome, 'platforms'));
 
     await runAndroidDevTool('avdmanager', [
         'create',

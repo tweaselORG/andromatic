@@ -90,7 +90,7 @@ For choosing the system image you can either:
 
 #### Defined in
 
-[emulator.ts:14](https://github.com/tweaselORG/andromatic/blob/main/src/emulator.ts#L14)
+[emulator.ts:15](https://github.com/tweaselORG/andromatic/blob/main/src/emulator.ts#L15)
 
 ## Variables
 
@@ -347,7 +347,7 @@ installed, and create the emulator.
 
 #### Defined in
 
-[emulator.ts:83](https://github.com/tweaselORG/andromatic/blob/main/src/emulator.ts#L83)
+[emulator.ts:84](https://github.com/tweaselORG/andromatic/blob/main/src/emulator.ts#L84)
 
 ___
 
