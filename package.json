@@ -1,7 +1,7 @@
 {
     "name": "andromatic",
     "version": "1.0.0",
-    "description": "Automate the installation and running of the Android developer tools on Windows, macOS, and Linux.",
+    "description": "Automate the installation and running of the Android developer tools on Windows, macOS, and Linux. Create Android emulators.",
     "bugs": "https://github.com/tweaselORG/andromatic/issues",
     "repository": {
         "type": "git",
@@ -70,6 +70,7 @@
         "lint-staged": "13.2.2",
         "parcel": "2.8.3",
         "prettier": "2.8.8",
+        "type-fest": "^3.11.1",
         "typedoc": "0.24.6",
         "typedoc-plugin-markdown": "3.15.3",
         "typescript": "5.0.4"

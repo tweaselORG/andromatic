@@ -1,6 +1,6 @@
 # andromatic
 
-> Automate the installation and running of the Android developer tools on Windows, macOS, and Linux.
+> Automate the installation and running of the Android developer tools on Windows, macOS, and Linux. Create Android emulators.
 
 Andromatic is a Node.js module that automates the installation and usage of the [Android development tools](https://developer.android.com/tools) that are distributed as part of the Android SDK, such as `adb`, `emulator`, `dexdump`, `aapt`, `cmake`, etc. on Windows, macOS, and Linux. It automatically downloads and manages the required packages for you on demand using `sdkmanager`, and provides functions to get the path or run any tool with a given version. It also automatically downloads a suitable version of Java if it isn't installed already. This is especially useful if you are writing a library that depends on (some of) these tools but don't want your users to have to install them manually.
 
@@ -21,6 +21,8 @@ A few things to keep in mind:
 * The binaries downloaded by andromatic are released by Google under proprietary licenses that you need to follow. See especially the [Android Software Development Kit License Agreement](https://developer.android.com/studio/terms).
 * Andromatic is a wrapper around Google's `sdkmanager`, it downloads the packages from `https://dl.google.com`. If no Java installation was found, it downloads binaries from the [Adoptium](https://adoptium.net/) project. Be aware of the privacy implications.
 
+Finally, andromatic can also create and manage Android emulators for you using `avdmanager`. It will automatically install the necessary packages for the system image you specified and create the emulator for you.
+
 ## Installation
 
 You can install andromatic using yarn or npm:
@@ -35,6 +37,8 @@ yarn add andromatic
 A full API reference can be found in the [`docs` folder](/docs/README.md).
 
 ## Usage
+
+### Installing and running developer tools
 
 You can run tools through the `runAndroidDevTool()` function. The first time you use a new tool, it will be downloaded and installed automatically. This might take a moment. Subsequent uses will be much faster, as the tool will already be installed.
 
@@ -110,6 +114,51 @@ Finally, andromatic provides the following more advanced functions:
 
 * `listPackages()` gives you an array of available packages that can be installed by `sdkmanager`, each with their path, version, and description.
 * `getAndroidDevToolPath()` returns the path to a tool's executable (and optionally installs it if necessary) without running it.
+
+### Creating emulators
+
+You can also create emulators through the `createEmulator()` function. The first time you create an emulator with a new system image, it will be downloaded and installed automatically. This might take some time. Subsequent creations will be much faster, as the system image will already be installed.
+
+Here is how you would create an emulator named `test` with Android 13, Google APIs and the Play Store, emulating a Pixel 2 device with 16 GB of storage:
+
+```ts
+import { createEmulator } from 'andromatic';
+
+(async () => {
+    await createEmulator('test', {
+        apiLevel: 33,
+        variant: 'google_apis_playstore',
+        architecture: 'x86_64',
+
+        device: 'pixel_2',
+        partitionSize: 16384,
+    });
+})();
+```
+
+Note how we specified the system image using the `apiLevel`, `variant` and `architecture` properties. Alternatively, you can also manually specify the system image using the `package` property, which should match the path used by `sdkmanager`. For example, to create an emulator with the same system image as before, you could also do:
+
+```ts
+import { createEmulator } from 'andromatic';
+
+(async () => {
+    await createEmulator('test', {
+        package: 'system-images;android-33;google_apis_playstore;x86_64',
+
+        device: 'pixel_2',
+    });
+})();
+```
+
+To run the emulator you created, you can use the `runAndroidDevTool`, for example:
+
+```ts
+import { runAndroidDevTool } from 'andromatic';
+
+(async () => {
+    await runAndroidDevTool('emulator', ['-avd', 'test']);
+})();
+```
 
 ## CLI
 

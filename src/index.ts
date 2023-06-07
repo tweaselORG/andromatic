@@ -148,7 +148,7 @@ const ensureJavaHome = async (options?: { install?: boolean }): Promise<string> 
     return ensureJavaHome({ install: false });
 };
 
-const ensureSdkmanager = async (options?: { ensureLicenses?: boolean }) => {
+export const ensureSdkmanager = async (options?: { ensureLicenses?: boolean }) => {
     // Google only provides the command-line tools binaries for Windows, macOS, and Linux.
     const platform = process.platform;
     if (platform !== 'win32' && platform !== 'darwin' && platform !== 'linux')
@@ -408,3 +408,6 @@ export const runAndroidDevTool = async (tool: AndroidTool, args?: string[], exec
     const toolPath = await getAndroidDevToolPath(tool);
     return execa(toolPath, args, { ...execaOptions, env: { ...env, ...execaOptions?.env } });
 };
+
+export { createEmulator } from './emulator';
+export type { EmulatorOptions } from './emulator';

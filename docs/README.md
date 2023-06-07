@@ -9,6 +9,7 @@ andromatic
 - [AndroidTool](README.md#androidtool)
 - [AndroidToolName](README.md#androidtoolname)
 - [AvailablePackage](README.md#availablepackage)
+- [EmulatorOptions](README.md#emulatoroptions)
 
 ### Variables
 
@@ -17,6 +18,7 @@ andromatic
 
 ### Functions
 
+- [createEmulator](README.md#createemulator)
 - [getAndroidDevToolPath](README.md#getandroiddevtoolpath)
 - [installAndroidDevTool](README.md#installandroiddevtool)
 - [installPackages](README.md#installpackages)
@@ -71,6 +73,24 @@ A package that can be installed by `sdkmanager`.
 #### Defined in
 
 [index.ts:214](https://github.com/tweaselORG/andromatic/blob/main/src/index.ts#L214)
+
+___
+
+### EmulatorOptions
+
+Ƭ **EmulatorOptions**: `MergeExclusive`<{ `package`: `string`  }, { `apiLevel`: `number` ; `architecture`: ``"x86"`` \| ``"x86_64"`` \| ``"armeabi-v7a"`` \| ``"arm64-v8a"`` ; `variant`: ``"default"`` \| ``"google_apis"`` \| ``"google_apis_playstore"`` \| ``"aosp_atd"`` \| ``"google_atd"`` \| ``"android-tv"`` \| ``"google-tv"`` \| ``"android-wear"`` \| ``"android-wear-cn"``  }\> & { `device?`: `string` ; `force?`: `boolean` ; `partitionSize?`: `number`  }
+
+The options for creating an emulator using the [createEmulator](README.md#createemulator) function.
+
+For choosing the system image you can either:
+
+- Specify only `package`, or…
+- Specify `apiLevel`, `variant`, and `architecture` but not `package`. Note that not all combinations of these
+  properties actually have a system image available.
+
+#### Defined in
+
+[emulator.ts:15](https://github.com/tweaselORG/andromatic/blob/main/src/emulator.ts#L15)
 
 ## Variables
 
@@ -306,6 +326,30 @@ to `$ANDROID_HOME`.
 [index.ts:67](https://github.com/tweaselORG/andromatic/blob/main/src/index.ts#L67)
 
 ## Functions
+
+### createEmulator
+
+▸ **createEmulator**(`name`, `options`): `Promise`<`void`\>
+
+Creates an emulator with the given name and options. It will install the required system image if it is not already
+installed, and create the emulator.
+
+#### Parameters
+
+| Name | Type | Description |
+| :------ | :------ | :------ |
+| `name` | `string` | The name of the emulator to create. |
+| `options` | [`EmulatorOptions`](README.md#emulatoroptions) | The options for creating the emulator. See [EmulatorOptions](README.md#emulatoroptions). |
+
+#### Returns
+
+`Promise`<`void`\>
+
+#### Defined in
+
+[emulator.ts:84](https://github.com/tweaselORG/andromatic/blob/main/src/emulator.ts#L84)
+
+___
 
 ### getAndroidDevToolPath
 
