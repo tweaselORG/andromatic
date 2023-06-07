@@ -410,3 +410,4 @@ export const runAndroidDevTool = async (tool: AndroidTool, args?: string[], exec
 };
 
 export { createEmulator } from './emulator';
+export type { EmulatorOptions } from './emulator';
