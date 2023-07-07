@@ -72,7 +72,7 @@ A package that can be installed by `sdkmanager`.
 
 #### Defined in
 
-[index.ts:214](https://github.com/tweaselORG/andromatic/blob/main/src/index.ts#L214)
+[index.ts:218](https://github.com/tweaselORG/andromatic/blob/main/src/index.ts#L218)
 
 ___
 
@@ -377,7 +377,7 @@ The path to the installed tool's executable.
 
 #### Defined in
 
-[index.ts:336](https://github.com/tweaselORG/andromatic/blob/main/src/index.ts#L336)
+[index.ts:340](https://github.com/tweaselORG/andromatic/blob/main/src/index.ts#L340)
 
 ___
 
@@ -406,7 +406,7 @@ The path to the installed tool's executable.
 
 #### Defined in
 
-[index.ts:289](https://github.com/tweaselORG/andromatic/blob/main/src/index.ts#L289)
+[index.ts:293](https://github.com/tweaselORG/andromatic/blob/main/src/index.ts#L293)
 
 ___
 
@@ -431,7 +431,7 @@ The path to `$ANDROID_HOME` where the packages are installed.
 
 #### Defined in
 
-[index.ts:262](https://github.com/tweaselORG/andromatic/blob/main/src/index.ts#L262)
+[index.ts:266](https://github.com/tweaselORG/andromatic/blob/main/src/index.ts#L266)
 
 ___
 
@@ -449,7 +449,7 @@ An array of packages, each with their package path, version and description.
 
 #### Defined in
 
-[index.ts:233](https://github.com/tweaselORG/andromatic/blob/main/src/index.ts#L233)
+[index.ts:237](https://github.com/tweaselORG/andromatic/blob/main/src/index.ts#L237)
 
 ___
 
@@ -479,7 +479,7 @@ The result from execa, see: https://github.com/sindresorhus/execa#childprocess.
 
 #### Defined in
 
-[index.ts:405](https://github.com/tweaselORG/andromatic/blob/main/src/index.ts#L405)
+[index.ts:409](https://github.com/tweaselORG/andromatic/blob/main/src/index.ts#L409)
 
 ___
 
@@ -495,4 +495,4 @@ Update all installed packages to the latest version using `sdkmanager`.
 
 #### Defined in
 
-[index.ts:271](https://github.com/tweaselORG/andromatic/blob/main/src/index.ts#L271)
+[index.ts:275](https://github.com/tweaselORG/andromatic/blob/main/src/index.ts#L275)

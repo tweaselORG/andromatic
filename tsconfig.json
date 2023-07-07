@@ -1,6 +1,9 @@
 {
     "extends": "@baltpeter/tsconfig",
     "include": ["src/**/*"],
+    "compilerOptions": {
+        "esModuleInterop": true
+    },
     "typedocOptions": {
         "plugin": ["typedoc-plugin-markdown"],
         "entryPoints": ["src/index.ts"],
