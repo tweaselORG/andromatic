@@ -1,4 +1,4 @@
-import locateJavaHomeModule from '@viperproject/locate-java-home/js/es6';
+import locateJavaHomeModule from '@viperproject/locate-java-home';
 import type { IJavaHomeInfo, ILocateJavaHomeOptions } from '@viperproject/locate-java-home/js/es6/lib/interfaces';
 import semverCoerce from 'semver/functions/coerce.js';
 import semverCompare from 'semver/functions/compare.js';
