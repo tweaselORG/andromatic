@@ -1,6 +1,6 @@
 {
     "name": "andromatic",
-    "version": "1.1.0",
+    "version": "1.1.1",
     "description": "Automate the installation and running of the Android developer tools on Windows, macOS, and Linux. Create Android emulators.",
     "bugs": "https://github.com/tweaselORG/andromatic/issues",
     "repository": {
