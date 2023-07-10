@@ -111,11 +111,15 @@ export type AndroidToolName = keyof typeof versionedAndroidTools | keyof typeof 
  */
 export type AndroidTool = AndroidToolName | { tool: keyof typeof versionedAndroidTools; packageVersion: string };
 
-const ensureJavaHome = async (options?: { install?: boolean }): Promise<string> => {
-    const systemJavaHome = await findJavaHome({ allowJre: true });
-    if (systemJavaHome) return systemJavaHome;
+export { createEmulator } from './emulator';
+export type { EmulatorOptions } from './emulator';
 
+const ensureJavaHome = async (options?: { install?: boolean }): Promise<string> => {
     const javaVersion = 17;
+
+    const systemJavaHomes = await findJavaHome({ version: `>=${javaVersion}` });
+    if (systemJavaHomes?.[0]) return systemJavaHomes[0].path;
+
     const javaCacheDir = await globalCacheDir('andromatic-java');
 
     const existingBinaries = (
@@ -408,6 +412,3 @@ export const runAndroidDevTool = async (tool: AndroidTool, args?: string[], exec
     const toolPath = await getAndroidDevToolPath(tool);
     return execa(toolPath, args, { ...execaOptions, env: { ...env, ...execaOptions?.env } });
 };
-
-export { createEmulator } from './emulator';
-export type { EmulatorOptions } from './emulator';
