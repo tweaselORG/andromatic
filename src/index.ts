@@ -230,14 +230,16 @@ export type AvailablePackage = {
     description: string;
 };
 /**
- * Fetch a list of available packages that can be installed by `sdkmanager`.
+ * Fetch a list of available or installed packages that can be or have been installed by `sdkmanager`.
  *
+ * @param options If `ìnstalled` is true, fetch a list of all installed packages (instead of ones available for
+ *   install).
  * @returns An array of packages, each with their package path, version and description.
  */
-export const listPackages = async (): Promise<AvailablePackage[]> => {
+export const listPackages = async (options?: { installed: boolean }): Promise<AvailablePackage[]> => {
     const { sdkmanager, env } = await ensureSdkmanager();
 
-    const { stdout } = await execa(sdkmanager, ['--list'], { env });
+    const { stdout } = await execa(sdkmanager, [options?.installed ? '--list_installed' : '--list'], { env });
 
     const lines = stdout.split('\n');
     /*
@@ -246,14 +248,29 @@ export const listPackages = async (): Promise<AvailablePackage[]> => {
     -------                              | -------      | -------
     add-ons;addon-google_apis-google-15  | 3            | Google APIs
     */
-    const availableHeaderIndex = lines.findIndex((line) => line.startsWith('Available Packages:'));
+    const headerIndex = lines.findIndex((line) =>
+        line.startsWith(options?.installed ? 'Installed packages:' : 'Available Packages:')
+    );
 
     return lines
-        .slice(availableHeaderIndex + 3)
+        .slice(headerIndex + 3)
         .map((line) => line.split('|').map((v) => v.trim()))
         .map(([path, version, description]) => ({ path, version, description }))
         .filter((p): p is AvailablePackage => !!p.path && !!p.version && !!p.description);
 };
+
+/**
+ * Checks whether a package has been installed by `sdkmanager`.
+ *
+ * @param packageName Name of the package to check. Should match the `sdkmanager` package path.
+ * @param version If needed, additional check if the specified version ist installed.
+ *
+ * @returns A boolean which is true if the package is currently installed.
+ */
+export const isInstalled = async (packageName: string, version?: string) =>
+    (await listPackages({ installed: true })).some(
+        (p) => p.path.startsWith(packageName) && (version ? p.version === version : true)
+    );
 
 /**
  * Install one or more packages using `sdkmanager`. The specified packages are installed or updated to the latest
