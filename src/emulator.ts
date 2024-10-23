@@ -1,7 +1,7 @@
 import fs from 'fs-extra';
 import { join } from 'path';
 import type { MergeExclusive } from 'type-fest';
-import { ensureSdkmanager, installPackages, isInstalled, runAndroidDevTool } from './index';
+import { ensureSdkmanager, installPackages, runAndroidDevTool } from './index';
 
 /**
  * The options for creating an emulator using the {@link createEmulator} function.
@@ -95,7 +95,7 @@ export const createEmulator = async (name: string, options: EmulatorOptions) => 
         if (!(await fs.pathExists(join(androidHome, dir)))) await fs.ensureDir(join(androidHome, dir));
 
     // The `emulator` package is required by avdmanager, so we need to check for it
-    if (!(await isInstalled('emulator'))) await installPackages('emulator');
+    if (!(await fs.pathExists(join(androidHome, 'emulator')))) await installPackages('emulator');
 
     await runAndroidDevTool('avdmanager', [
         'create',
