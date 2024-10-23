@@ -233,7 +233,7 @@ export type AvailablePackage = {
  * Fetch a list of available or installed packages that can be or have been installed by `sdkmanager`.
  *
  * @param options If `ìnstalled` is true, fetch a list of all installed packages (instead of ones available for
- *   install).
+ *   install). Defaults to `false`.
  * @returns An array of packages, each with their package path, version and description.
  */
 export const listPackages = async (options?: { installed: boolean }): Promise<AvailablePackage[]> => {
