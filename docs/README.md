@@ -471,7 +471,7 @@ Fetch a list of available or installed packages that can be or have been install
 
 | Name | Type | Description |
 | :------ | :------ | :------ |
-| `options?` | `Object` | If `ìnstalled` is true, fetch a list of all installed packages (instead of ones available for install). |
+| `options?` | `Object` | If `ìnstalled` is true, fetch a list of all installed packages (instead of ones available for install). Defaults to `false`. |
 | `options.installed` | `boolean` | - |
 
 #### Returns
