@@ -22,6 +22,7 @@ andromatic
 - [getAndroidDevToolPath](README.md#getandroiddevtoolpath)
 - [installAndroidDevTool](README.md#installandroiddevtool)
 - [installPackages](README.md#installpackages)
+- [isInstalled](README.md#isinstalled)
 - [listPackages](README.md#listpackages)
 - [runAndroidDevTool](README.md#runandroiddevtool)
 - [updatePackages](README.md#updatepackages)
@@ -377,7 +378,7 @@ The path to the installed tool's executable.
 
 #### Defined in
 
-[index.ts:340](https://github.com/tweaselORG/andromatic/blob/main/src/index.ts#L340)
+[index.ts:357](https://github.com/tweaselORG/andromatic/blob/main/src/index.ts#L357)
 
 ___
 
@@ -406,7 +407,7 @@ The path to the installed tool's executable.
 
 #### Defined in
 
-[index.ts:293](https://github.com/tweaselORG/andromatic/blob/main/src/index.ts#L293)
+[index.ts:310](https://github.com/tweaselORG/andromatic/blob/main/src/index.ts#L310)
 
 ___
 
@@ -431,15 +432,47 @@ The path to `$ANDROID_HOME` where the packages are installed.
 
 #### Defined in
 
-[index.ts:266](https://github.com/tweaselORG/andromatic/blob/main/src/index.ts#L266)
+[index.ts:283](https://github.com/tweaselORG/andromatic/blob/main/src/index.ts#L283)
+
+___
+
+### isInstalled
+
+▸ **isInstalled**(`packageName`, `version?`): `Promise`<`boolean`\>
+
+Checks whether a package has been installed by `sdkmanager`.
+
+#### Parameters
+
+| Name | Type | Description |
+| :------ | :------ | :------ |
+| `packageName` | `string` | Name of the package to check. Should match the `sdkmanager` package path. |
+| `version?` | `string` | If needed, additional check if the specified version ist installed. |
+
+#### Returns
+
+`Promise`<`boolean`\>
+
+A boolean which is true if the package is currently installed.
+
+#### Defined in
+
+[index.ts:270](https://github.com/tweaselORG/andromatic/blob/main/src/index.ts#L270)
 
 ___
 
 ### listPackages
 
-▸ **listPackages**(): `Promise`<[`AvailablePackage`](README.md#availablepackage)[]\>
+▸ **listPackages**(`options?`): `Promise`<[`AvailablePackage`](README.md#availablepackage)[]\>
 
-Fetch a list of available packages that can be installed by `sdkmanager`.
+Fetch a list of available or installed packages that can be or have been installed by `sdkmanager`.
+
+#### Parameters
+
+| Name | Type | Description |
+| :------ | :------ | :------ |
+| `options?` | `Object` | If `ìnstalled` is true, fetch a list of all installed packages (instead of ones available for install). |
+| `options.installed` | `boolean` | - |
 
 #### Returns
 
@@ -449,7 +482,7 @@ An array of packages, each with their package path, version and description.
 
 #### Defined in
 
-[index.ts:237](https://github.com/tweaselORG/andromatic/blob/main/src/index.ts#L237)
+[index.ts:239](https://github.com/tweaselORG/andromatic/blob/main/src/index.ts#L239)
 
 ___
 
@@ -479,7 +512,7 @@ The result from execa, see: https://github.com/sindresorhus/execa#childprocess.
 
 #### Defined in
 
-[index.ts:409](https://github.com/tweaselORG/andromatic/blob/main/src/index.ts#L409)
+[index.ts:426](https://github.com/tweaselORG/andromatic/blob/main/src/index.ts#L426)
 
 ___
 
@@ -495,4 +528,4 @@ Update all installed packages to the latest version using `sdkmanager`.
 
 #### Defined in
 
-[index.ts:275](https://github.com/tweaselORG/andromatic/blob/main/src/index.ts#L275)
+[index.ts:292](https://github.com/tweaselORG/andromatic/blob/main/src/index.ts#L292)

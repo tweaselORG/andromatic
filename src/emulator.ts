@@ -94,6 +94,9 @@ export const createEmulator = async (name: string, options: EmulatorOptions) => 
     for (const dir of ['platforms', 'platform-tools'])
         if (!(await fs.pathExists(join(androidHome, dir)))) await fs.ensureDir(join(androidHome, dir));
 
+    // The `emulator` package is required by avdmanager, so we need to check for it
+    if (!(await fs.pathExists(join(androidHome, 'emulator')))) await installPackages('emulator');
+
     await runAndroidDevTool('avdmanager', [
         'create',
         'avd',
